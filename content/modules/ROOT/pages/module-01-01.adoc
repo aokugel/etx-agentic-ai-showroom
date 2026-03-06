@@ -1,5 +1,5 @@
 :imagesdir: ../assets/images
-= Setting the Stage test
+= Setting the Stage test 2
 
 == The Use Case
 
