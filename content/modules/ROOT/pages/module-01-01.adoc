@@ -29,11 +29,13 @@ This manual intervention is:
 * Not scalable as the team grows
 * Lacking consistent documentation of solutions
 
+////
 == How to think about the problem (DORA and MTTR)
 
 * DORA metrics are industry-standard measures of software delivery performance used to identify high performing teams: Deployment Frequency, Lead Time for Changes, Change Failure Rate, and Mean Time to Recovery (MTTR). See https://dora.dev[https://dora.dev,window=_blank] for background.
 * MTTR is the average time it takes to restore service after a failure. Lower MTTR means faster recovery and less downtime.
 * In later modules you will codify the agent and wire it into the pipeline’s finally step so failures automatically trigger the agent—helping drive down MTTR.
+////
 
 == The Solution: AI-Powered CI/CD Agent
 

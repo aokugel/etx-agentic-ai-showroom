@@ -33,24 +33,24 @@ There's a Llama Stack instance that's running in your lab environment. We will u
 * Interactively from the Llama Stack Playground frontend, running as a container on the cluster
 * And programmatically from the agent service through the Llama Stack Python SDK. Note that since Llama Stack implements the OpenAI API, any library that consumes the OpenAI API can be used as a client.
 
-=== A note about Red Hat AI 3.x
+// === A note about Red Hat AI 3.x
 
-This lab environment is built on Red Hat OpenShift AI 2.25. 
+// This lab environment is built on Red Hat OpenShift AI 2.25. 
 
-In the 3.x release of Red Hat AI, we have a few key deployment differences:
+// In the 3.x release of Red Hat AI, we have a few key deployment differences:
 
-. Llama Stack is a tech preview feature configured as part of your DataScienceCluster resource and deployed with OpenShift AI.
-. The "playground" where you can test your various asset integrations is integrated into the OpenShift AI dashboard. We do not ship nor support the Llama Stack upstream playground image. 
-. 3.x has deprecated the inclusion and support of Llama Stack agents api in favor of the responses API. This is the biggest difference. See links for more information:
-.. https://docs.google.com/document/d/1IfOfdZ9FjU1fQdLTGso0Ikg-j2uL9XZXem4jbZQSq6w/edit?tab=t.0#heading=h.2bx3kla20plm[Product management FAQ]
-.. https://llamastack.github.io/docs/v0.3.4/building_applications/responses_vs_agents[Llama stack documentation comparing APIs]
-.. https://llamastack.github.io/docs/providers/openai_responses_limitations[Known responses API limitations]
+// . Llama Stack is a tech preview feature configured as part of your DataScienceCluster resource and deployed with OpenShift AI.
+// . The "playground" where you can test your various asset integrations is integrated into the OpenShift AI dashboard. We do not ship nor support the Llama Stack upstream playground image. 
+// . 3.x has deprecated the inclusion and support of Llama Stack agents api in favor of the responses API. This is the biggest difference. See links for more information:
+// .. https://docs.google.com/document/d/1IfOfdZ9FjU1fQdLTGso0Ikg-j2uL9XZXem4jbZQSq6w/edit?tab=t.0#heading=h.2bx3kla20plm[Product management FAQ]
+// .. https://llamastack.github.io/docs/v0.3.4/building_applications/responses_vs_agents[Llama stack documentation comparing APIs]
+// .. https://llamastack.github.io/docs/providers/openai_responses_limitations[Known responses API limitations]
 
-=== Why have we chosen to use the older Red Hat AI deployment and not 3.x for this lab experience?
+// === Why have we chosen to use the older Red Hat AI deployment and not 3.x for this lab experience?
 
-. We wanted to showcase implementing safety guardian models, which is not currently supported in 3.x, but was supported with 2.25.
-. The responses api has current limitations, and we do not have clean paths from product to follow for other agent framework integrations with Llama Stack. Therefore, it made more sense to showcase the Llama Stack Agents API implementation so that we could accomplish the complete workflow of an agentic deployment. 
-. It is not challenging to move to 3.x and to be able to apply the skills you will learn in this workshop with ease.
+// . We wanted to showcase implementing safety guardian models, which is not currently supported in 3.x, but was supported with 2.25.
+// . The responses api has current limitations, and we do not have clean paths from product to follow for other agent framework integrations with Llama Stack. Therefore, it made more sense to showcase the Llama Stack Agents API implementation so that we could accomplish the complete workflow of an agentic deployment. 
+// . It is not challenging to move to 3.x and to be able to apply the skills you will learn in this workshop with ease.
 
 === Using the Llama Stack CLI
 

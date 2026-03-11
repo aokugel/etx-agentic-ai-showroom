@@ -3,12 +3,12 @@
 ** xref:module-01-02.adoc[1.2 The Lab]
 * 2. Building the Agent
 ** xref:module-02-01.adoc[2.1 Introducing Llama Stack]
-** xref:module-02-02.adoc[2.2 Tools and Agents]
-** xref:module-02-03.adoc[2.3 Model Context Protocol]
-* 3. From Prototype to App
+** xref:module-04-02.adoc[2.2 Agentic System Observability]
+** xref:module-02-02.adoc[2.3 Tools and Agents]
+** xref:module-02-03.adoc[2.4 Model Context Protocol]
+* 3. From Prototype to App (Optional)
 ** xref:module-03.adoc[3.1 From Prototype to App]
-* 4. Hardening, Observability, Promotion
+* 4. Guardrails (Optional)
 ** xref:module-04-01.adoc[4.1 Adding Guardrails]
-** xref:module-04-02.adoc[4.2 Agentic System Observability]
 * 5. Conclusion
 ** xref:module-closing.adoc[Wrap Up]

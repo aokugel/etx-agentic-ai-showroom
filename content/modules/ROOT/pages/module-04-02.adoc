@@ -61,6 +61,144 @@ These environment variables configure Llama Stack to:
 * Enable both trace and metric sinks for comprehensive observability
 * Tag all telemetry with the service name for filtering in Tempo and Prometheus
 
+== Configuring Llama Stack
+
+As part of Red Hat AI, a Llama Stack instance is represented by the LlamaStackDistribution custom resource (CR) that defines the Llama Stack server configuration including:
+
+* **Server Configuration**: Which distribution to use (including built-in tools etc.)
+* **Container Specifications**: Port, environment variables, resource limits
+
+There is a unique instance of Llama Stack distribution deployed for each lab user.
+
+. Locate the Llama Stack distribution.
++
+image::llamastackdistribution-search.png[Llama Stack distribution, 800]
++
+
+. Click on the existing distribution.
++
+image::llamastackdistribution-current.png[Llama Stack distribution current, 800]
++
+
+. Click on the YAML tab
++
+image::llamastackdistribution-tab.png[Llama Stack distribution tab, 800]
++
+
+. Review the Llama Stack Distribution we're using for this lab.
+
+[source,yaml]
+----
+apiVersion: llamastack.io/v1alpha1
+kind: LlamaStackDistribution
+metadata:
+  name: user1-llama-stack
+spec:
+  replicas: 1
+  server:
+    containerSpec:
+      env:
+        - name: TELEMETRY_SINKS
+          value: 'console, sqlite, otel_trace, otel_metric'
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: 'http://otel-collector-collector.observability-hub.svc.cluster.local:4318'
+        - name: OTEL_SERVICE_NAME
+          value: user1-llamastack
+        - name: DEFAULT_MODEL_API_TOKEN   # [1]
+          valueFrom:
+            secretKeyRef:
+              key: apiKey
+              name: granite-3-2-8b-instruct
+        - name: TAVILY_API_KEY            # [2]
+          valueFrom:
+            secretKeyRef:
+              key: tavily-search-api-key
+              name: tavily-search-key
+      name: llama-stack
+      port: 8321
+    distribution:
+      name: rh-dev
+    userConfig:                           # [3]
+      configMapName: llama-stack-config
+----
+
+As you can see, we've specified the secrets for the services that'll be interacting with the Llama Stack server:
+
+* [1] MaaS API
+* [2] Tavily search API. We will update this API key in a moment.
+
+Also listed is [3] the user configuration used with this distribution (ConfigMap: llama-stack-config). Let's review this configuration before updating the Tavily search key.
+
+== Llama Stack User Config
+
+The user config configmap can be used to store the `run.yaml` configuration for each Llama Stack distribution. Updates to the ConfigMap will restart the Pod to load the new data.
+
+Your current Llama Stack config should like the following. Reference the ConfigMap resource in the UI or terminal, your preference. Refer to the https://llamastack.github.io/docs/distributions/customizing_run_yaml[Llama Stack documentation] for details and customization options.
+
+[source,yaml,options="wrap"]
+----
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: llama-stack-config
+data:
+  run.yaml: |
+    # Llama Stack configuration
+    version: '2'
+    image_name: rh
+    apis:
+    - inference
+    - tool_runtime
+    - agents
+    - safety
+    - vector_io
+    models:
+      - metadata: {}
+        model_id: granite-3-2-8b-instruct
+        provider_id: vllm
+        provider_model_id: granite-3-2-8b-instruct
+        model_type: llm
+      - metadata: {}
+        model_id: Llama-Guard-3-1B
+        provider_id: vllm
+        provider_model_id: Llama-Guard-3-1B
+        model_type: llm
+    providers:
+      inference:
+      - provider_id: vllm
+        provider_type: "remote::vllm"
+        config:
+          url: https://litellm-prod.apps.maas.redhatworkshops.io/v1
+          context_length: 4096
+          api_token: ${env.DEFAULT_MODEL_API_TOKEN}
+          tls_verify: true
+      tool_runtime:
+      - provider_id: tavily-search
+        provider_type: remote::tavily-search
+        config:
+          api_key: ${env.TAVILY_API_KEY}
+          max_results: 3
+      agents:
+      - provider_id: meta-reference
+        provider_type: inline::meta-reference
+        config:
+          persistence_store:
+            type: sqlite
+            db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/rh}/agents_store.db
+          responses_store:
+            type: sqlite
+            db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/rh}/responses_store.db
+    server:
+      port: 8321
+    tools:
+      - name: builtin::websearch
+        enabled: true
+    tool_groups:
+    - provider_id: tavily-search
+      toolgroup_id: builtin::websearch
+----
+
+
 == Add observability to the Llama Stack ConfigMap
 
 . Edit the Llama Stack ConfigMap to add telemetry stanza with the service name, sinks and the OTEL Tracing endpoint which is set as an environment variable on the Deployment:
