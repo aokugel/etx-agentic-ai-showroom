@@ -26,14 +26,16 @@ To get started, please log in with your user using both in the *Terminal* and th
 ----
 
 
-== Required Skills
+== Expected Background
 
-* Basic familiarity with Python programming
-* Basic understanding of CI/CD pipelines
-* Basic Git Knowledge: Cloning repositories, basic version control concepts
-* Command Line Basics: Navigating directories, running commands
-* Container Concepts: Understanding of containers and Kubernetes/OpenShift (helpful but not required)
-* Good grasp of https://openpracticelibrary.com/practice/gitops[GitOps,window=_blank] and https://openpracticelibrary.com/practice/everything-as-code[Everything as Code practices,window=_blank]
+This lab is designed for consulting-level practitioners at partner organizations. Participants should be comfortable with:
+
+* Python programming and reading Python application code
+* CI/CD pipeline concepts and troubleshooting
+* Git workflows: branching, forking, committing, and pushing
+* Command line operations and editing YAML
+* Containers and Kubernetes/OpenShift fundamentals (namespaces, pods, ConfigMaps, secrets)
+* https://openpracticelibrary.com/practice/gitops[GitOps,window=_blank] and https://openpracticelibrary.com/practice/everything-as-code[Everything as Code,window=_blank] practices
 
 ☕ Buckle Up, Here we go ...
 

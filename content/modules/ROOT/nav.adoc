@@ -1,14 +1,13 @@
 * 1. Introduction & Overview
 ** xref:module-01-01.adoc[1.1 Setting the Stage]
 ** xref:module-01-02.adoc[1.2 The Lab]
-* 2. Building the Agent
+* 2. Llama Stack & the Playground
 ** xref:module-02-01.adoc[2.1 Introducing Llama Stack]
-** xref:module-04-02.adoc[2.2 Agentic System Observability]
-** xref:module-02-02.adoc[2.3 Tools and Agents]
-** xref:module-02-03.adoc[2.4 Model Context Protocol]
-* 3. From Prototype to App (Optional)
-** xref:module-03.adoc[3.1 From Prototype to App]
-* 4. Guardrails (Optional)
-** xref:module-04-01.adoc[4.1 Adding Guardrails]
-* 5. Conclusion
+* 3. Configuring Tools & Observability
+** xref:module-02-02.adoc[3.1 Tools, MCP, and Telemetry]
+* 4. Deploy and Run the Agent
+** xref:module-03.adoc[4.1 From Prototype to App]
+* 5. Viewing Traces
+** xref:module-04-02.adoc[5.1 Agentic System Observability]
+* 6. Conclusion
 ** xref:module-closing.adoc[Wrap Up]

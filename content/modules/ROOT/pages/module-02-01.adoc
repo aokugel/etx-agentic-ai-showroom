@@ -3,24 +3,15 @@
 
 include::vars.adoc[]
 
-In order to build and run our CI/CD agent, we'll need a number of components. Here is what is needed and what we'll use in our lab:
+In order to build and run our CI/CD agent, we'll need a number of components:
 
-* An **LLM** for analyzing the CI/CD pipeline logs and generating recommendations for troubleshooting. We'll leverage a Llama model that is hosted in a remote environment and that we're accessing through a Models-as-a-Service interface.
-* A **Guardian Model** to provide a safety shield against harmful content for our model and agent interactions. We will leverage another Llama model that will also be hosted in the same remote environment via a MaaS infrastructure setup.
-* A **graphical user interface** for interactively querying the LLM and experimenting with user prompts and agentic capabilities. We'll use Llama Stack Playground, an open source, frontend application designed for Llama Stack (see below).
-* An **agentic framework** for building out the agent as an application component. There's a wide variety of established frameworks. In our lab, we'll rely on the Llama Stack agents API. 
-* Access to **third-party systems** depending on the use case:
-** The CI/CD runtime, which contains the logs of the failed pipelines. In our lab, we'll leverage OpenShift Pipelines as the CI/CD engine. We can access the pipeline logs simply via the OpenShift interface.
-** The internet for searching potential resolutions of the encountered pipelines failures.
-** The destination of the generated failure report. In our case, the agent will create issues within a forked Github repository, that you manage, and upload its reports there.
-* In order to orchestrate the various interactions between the agent, the model, and the third-party systems, we'll rely on a central **API server** that is tailored for agentic use cases. This is where **Llama Stack** comes into play.
+* An **LLM** for analyzing the CI/CD pipeline logs and generating recommendations. We'll leverage a Granite model hosted remotely via a Models-as-a-Service interface.
+* A **graphical user interface** for interacting with the LLM and experimenting with prompts and agentic capabilities. We'll use the Llama Stack Playground.
+* An **agentic framework** for building the agent as an application. We'll rely on the Llama Stack agents API.
+* Access to **third-party systems**: the CI/CD runtime (OpenShift Pipelines), web search for troubleshooting, and GitHub for issue tracking.
+* A central **API server** to orchestrate agent-model-tool interactions — this is where **Llama Stack** comes in.
 
-In this chapter we will cover agent prototyping with Llama Stack. Specifically, we will
-
-1. Use Llama Stack Playground for basic prompting against our model through Llama Stack,
-2. Configure the built-in websearch tool in Llama Stack,
-3. Set up integration with OpenShift and Github through MCP,
-4. Build a prompt that covers the end-to-end use case.
+In this chapter we'll get familiar with Llama Stack and the Playground by prompting against the model, setting up the foundation for tool integration in the next module.
 
 
 == Llama Stack
@@ -52,9 +43,9 @@ There's a Llama Stack instance that's running in your lab environment. We will u
 // . The responses api has current limitations, and we do not have clean paths from product to follow for other agent framework integrations with Llama Stack. Therefore, it made more sense to showcase the Llama Stack Agents API implementation so that we could accomplish the complete workflow of an agentic deployment. 
 // . It is not challenging to move to 3.x and to be able to apply the skills you will learn in this workshop with ease.
 
-=== Using the Llama Stack CLI
+=== Verify the Llama Stack Connection
 
-. Configure the **llama-stack-client** in your showroom terminal.
+. Configure the **llama-stack-client** in your showroom terminal and verify connectivity.
 
 +
 [source,bash,options="wrap",role="execute"]
@@ -71,70 +62,14 @@ http://{etx_agentic_ai_username}-llama-stack-service.{etx_agentic_ai_username}-l
 +
 When prompted for the API key, leave the value empty and hit enter.
 
-
-. Check the connection by listing the version--ideally we match client and server versions
+. Verify the connection:
 +
 [source,bash,options="wrap",role="execute"]
 ----
 llama-stack-client inspect version
 ----
 +
-[source,bash,options="wrap"]
-----
-INFO:httpx:HTTP Request: GET http://localhost:8321/v1/version "HTTP/1.1 200 OK"
-VersionInfo(version='0.2.22')
-----
-
-. If you need help with the client commands, take a look at
-+
-[source,bash,options="wrap",role="execute"]
-----
-llama-stack-client --help
-----
-
-. Now list the providers--this should match what we have configured so far i.e. Tavily Web Search, inference and agents
-+
-[source,bash,options="wrap",role="execute"]
-----
-llama-stack-client providers list
-----
-+
-[source,bash,options="wrap"]
-----
-INFO:httpx:HTTP Request: GET http://localhost:8321/v1/providers "HTTP/1.1 200 OK"
-┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ API          ┃ Provider ID    ┃ Provider Type          ┃
-┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ inference    │ vllm           │ remote::vllm           │
-│ tool_runtime │ tavily-search  │ remote::tavily-search  │
-│ agents       │ meta-reference │ inline::meta-reference │
-└──────────────┴────────────────┴────────────────────────┘
-
-----
-
-. Now list the models
-+
-[source,bash,options="wrap",role="execute"]
-----
-llama-stack-client models list
-----
-+
-[source,bash,options="wrap"]
-----
-INFO:httpx:HTTP Request: GET http://localhost:8321/v1/models "HTTP/1.1 200 OK"
-
-Available Models
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ model_type                   ┃ identifier                                               ┃ provider_resource_id                                     ┃ metadata               ┃ provider_id                   ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ llm                          │ granite-3-2-8b-instruct                                   │ granite-3-2-8b-instruct                                   │                        │ vllm                          │
-└──────────────────────────────┴──────────────────────────────────────────────────────────┴──────────────────────────────────────────────────────────┴────────────────────────┴───────────────────────────────┘
-
-Total models: 1
-
-----
-. Done ✅
+You should see a successful response with the server version. You can also explore `llama-stack-client --help` and commands like `providers list` or `models list` to inspect your distribution.
 
 === Playground: Llama Stack User Interface
 
@@ -178,4 +113,4 @@ What is the weather today in Brisbane?
 image::llamastack-playground-no-websearch.png[LlamaStack Playground without websearch, 800]
 
 
-. In order to find this type of real-time information, the LLM needs to call a tool like __websearch__. Let's dive into how to configure Llama Stack and set up access for the websearch tool.
+. In order to find this type of real-time information, the LLM needs to call a tool like __websearch__. In the next module, we'll configure all the tools our agent needs — websearch, OpenShift, and GitHub — along with observability telemetry, in a single configuration update.

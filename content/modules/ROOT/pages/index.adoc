@@ -3,19 +3,19 @@
 
 == Lab Overview
 
-This lab illustrates how agentic AI can be applied to help solve a real-world business problem. You will explore basic agentic AI capabilities and deploy an end-to-end agentic AI solution.
+This lab illustrates how agentic AI can be applied to help solve a real-world business problem. You will configure tools for an AI agent, deploy it as a service, trigger it from a CI/CD pipeline, and observe its behavior through distributed tracing.
 
 By the end of this workshop, participants will have:
 
 * ✅ A fully functional AI agent that can autonomously handle CI/CD failures
-* ✅ Understanding of agent development lifecycle and deployment
-* ✅ Experience with observability and evaluation of AI systems
-* ✅ Practical knowledge of integrating AI agents into real-world workflows
+* ✅ Hands-on experience integrating tools (websearch, OpenShift, GitHub) into an agentic framework
+* ✅ Practical knowledge of deploying and triggering agents in real-world workflows
+* ✅ Experience with observability and tracing of AI systems
 
 == Workflow
 
 1. Introduction and Overview
-2. Using Llama Stack
-3. Configure and Deploy your Agent
-4. Set up Safety Guardrails
-5. Agentic System Observability
+2. Llama Stack and the Playground
+3. Configure Tools and Observability
+4. Deploy and Run the Agent
+5. View and Analyze Traces

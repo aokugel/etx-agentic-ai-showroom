@@ -6,367 +6,139 @@ include::vars.adoc[]
 [IMPORTANT]
 .In this module
 ====
-Learn a practical, high-level flow to combine agent evaluation with observability so you can measure, understand, and improve behavior over time.
+Now that your agent is running and telemetry is configured, you'll use distributed tracing to understand what's happening inside your agentic system — where time is spent, how tools are invoked, and where to optimize.
 ====
 
-In the context of production Generative AI systems, observability is your ability to understand what’s happening inside your AI applications by examining the data it produces. 
-
-Without the necessary observability tooling, you only know something is wrong when it breaks or someone complains. With proper observability, you can spot problems before they impact your users and you're able to fix issues quickly.
-
-Easy, right?
+In production Generative AI systems, observability is your ability to understand what's happening inside your AI applications by examining the data they produce. Without it, you only know something is wrong when it breaks or someone complains. With proper observability, you can spot problems before they impact users and fix issues quickly.
 
 == Red Hat AI Observability Stack
 
-Red Hat AI provides https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/managing_openshift_ai/managing-observability_managing-rhoai[centralized platform observability]: an integrated, out-of-the-box solution for monitoring the health and performance of your Red Hat AI instance and user workloads.
-
-This centralized solution includes a dedicated, pre-configured observability stack, featuring the **OpenTelemetry Collector (OTC)** for standardized data ingestion, **Prometheus** for metrics, and the **Red Hat build of Tempo** for distributed tracing. This architecture enables a common set of health metrics and alerts for OpenShift AI components and offers mechanisms to integrate with your existing external observability tools.
+Red Hat AI provides https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/managing_openshift_ai/managing-observability_managing-rhoai[centralized platform observability]: an integrated solution featuring the **OpenTelemetry Collector (OTC)** for data ingestion, **Prometheus** for metrics, and the **Red Hat build of Tempo** for distributed tracing.
 
 image::observability-stack.png[]
 
-== OpenTelemetry: The Open-Source Standard for Observability
+We already enabled OpenTelemetry in our Llama Stack ConfigMap (the `telemetry` provider configured in the previous module). Llama Stack automatically creates spans for each inference request and emits token usage metrics. Each request generates:
 
-Red Hat OpenShift AI uses OpenTelemetry (OTel), the open-source standard for distributed tracing and metrics collection. OpenTelemetry provides:
-
-* Automatic instrumentation for common frameworks (Flask, FastAPI, Express, etc.)
-* Manual instrumentation for custom operations specific to your application
-* Vendor-neutral format that works with any tracing backend
-* Integration with metrics and logs for complete observability
-
-== OpenTelemetry and Llama Stack
-
-Llama Stack has built-in OpenTelemetry support through its meta-reference telemetry provider, which automatically instruments inference operations to generate observability data including traces and metrics.
-
-=== How Llama Stack Telemetry Works:
-
-When telemetry is enabled, Llama Stack automatically creates spans for each inference request and emits token usage metrics. Each request generates:
-
-* **Traces**: Distributed traces showing the inference request flow with timing data
-* **Metrics**: Token counters (llama_stack_prompt_tokens_total, llama_stack_completion_tokens_total, llama_stack_tokens_total) labeled by model_id and provider_id
-
-The telemetry configuration in Llama Stack includes the following variables:
-
-[source,sh,options="wrap"]
-----
-- name: TELEMETRY_SINKS
-  value: 'console, sqlite, otel_trace, otel_metric'
-- name: OTEL_EXPORTER_OTLP_ENDPOINT
-  value: 'http://otel-collector-collector.observability-hub.svc.cluster.local:4318'
-- name: OTEL_SERVICE_NAME
-  alue: user2-llamastack
-----
-
-These environment variables configure Llama Stack to:
-
-* Export telemetry data to the RHOAI OpenTelemetry Collector via OTLP (port 4318)
-* Enable both trace and metric sinks for comprehensive observability
-* Tag all telemetry with the service name for filtering in Tempo and Prometheus
-
-== Configuring Llama Stack
-
-As part of Red Hat AI, a Llama Stack instance is represented by the LlamaStackDistribution custom resource (CR) that defines the Llama Stack server configuration including:
-
-* **Server Configuration**: Which distribution to use (including built-in tools etc.)
-* **Container Specifications**: Port, environment variables, resource limits
-
-There is a unique instance of Llama Stack distribution deployed for each lab user.
-
-. Locate the Llama Stack distribution.
-+
-image::llamastackdistribution-search.png[Llama Stack distribution, 800]
-+
-
-. Click on the existing distribution.
-+
-image::llamastackdistribution-current.png[Llama Stack distribution current, 800]
-+
-
-. Click on the YAML tab
-+
-image::llamastackdistribution-tab.png[Llama Stack distribution tab, 800]
-+
-
-. Review the Llama Stack Distribution we're using for this lab.
-
-[source,yaml]
-----
-apiVersion: llamastack.io/v1alpha1
-kind: LlamaStackDistribution
-metadata:
-  name: user1-llama-stack
-spec:
-  replicas: 1
-  server:
-    containerSpec:
-      env:
-        - name: TELEMETRY_SINKS
-          value: 'console, sqlite, otel_trace, otel_metric'
-        - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: 'http://otel-collector-collector.observability-hub.svc.cluster.local:4318'
-        - name: OTEL_SERVICE_NAME
-          value: user1-llamastack
-        - name: DEFAULT_MODEL_API_TOKEN   # [1]
-          valueFrom:
-            secretKeyRef:
-              key: apiKey
-              name: granite-3-2-8b-instruct
-        - name: TAVILY_API_KEY            # [2]
-          valueFrom:
-            secretKeyRef:
-              key: tavily-search-api-key
-              name: tavily-search-key
-      name: llama-stack
-      port: 8321
-    distribution:
-      name: rh-dev
-    userConfig:                           # [3]
-      configMapName: llama-stack-config
-----
-
-As you can see, we've specified the secrets for the services that'll be interacting with the Llama Stack server:
-
-* [1] MaaS API
-* [2] Tavily search API. We will update this API key in a moment.
-
-Also listed is [3] the user configuration used with this distribution (ConfigMap: llama-stack-config). Let's review this configuration before updating the Tavily search key.
-
-== Llama Stack User Config
-
-The user config configmap can be used to store the `run.yaml` configuration for each Llama Stack distribution. Updates to the ConfigMap will restart the Pod to load the new data.
-
-Your current Llama Stack config should like the following. Reference the ConfigMap resource in the UI or terminal, your preference. Refer to the https://llamastack.github.io/docs/distributions/customizing_run_yaml[Llama Stack documentation] for details and customization options.
-
-[source,yaml,options="wrap"]
-----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: llama-stack-config
-data:
-  run.yaml: |
-    # Llama Stack configuration
-    version: '2'
-    image_name: rh
-    apis:
-    - inference
-    - tool_runtime
-    - agents
-    - safety
-    - vector_io
-    models:
-      - metadata: {}
-        model_id: granite-3-2-8b-instruct
-        provider_id: vllm
-        provider_model_id: granite-3-2-8b-instruct
-        model_type: llm
-      - metadata: {}
-        model_id: Llama-Guard-3-1B
-        provider_id: vllm
-        provider_model_id: Llama-Guard-3-1B
-        model_type: llm
-    providers:
-      inference:
-      - provider_id: vllm
-        provider_type: "remote::vllm"
-        config:
-          url: https://litellm-prod.apps.maas.redhatworkshops.io/v1
-          context_length: 4096
-          api_token: ${env.DEFAULT_MODEL_API_TOKEN}
-          tls_verify: true
-      tool_runtime:
-      - provider_id: tavily-search
-        provider_type: remote::tavily-search
-        config:
-          api_key: ${env.TAVILY_API_KEY}
-          max_results: 3
-      agents:
-      - provider_id: meta-reference
-        provider_type: inline::meta-reference
-        config:
-          persistence_store:
-            type: sqlite
-            db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/rh}/agents_store.db
-          responses_store:
-            type: sqlite
-            db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/rh}/responses_store.db
-    server:
-      port: 8321
-    tools:
-      - name: builtin::websearch
-        enabled: true
-    tool_groups:
-    - provider_id: tavily-search
-      toolgroup_id: builtin::websearch
-----
-
-
-== Add observability to the Llama Stack ConfigMap
-
-. Edit the Llama Stack ConfigMap to add telemetry stanza with the service name, sinks and the OTEL Tracing endpoint which is set as an environment variable on the Deployment:
-+
-[source,yaml,options="wrap"]
-----
-apis:
-...
-- telemetry
-
-providers:
-...
-  telemetry:
-  - provider_id: meta-reference
-    provider_type: inline::meta-reference
-    config:
-      service_name: "${env.OTEL_SERVICE_NAME:=}"
-      sinks: ${env.TELEMETRY_SINKS:=console}
-      otel_exporter_otlp_endpoint: ${env.OTEL_EXPORTER_OTLP_ENDPOINT:=}
-      sqlite_db_path: /opt/app-root/src/.llama/distributions/rh/trace_store.db
-----
-+
-We will focus on distributed tracing for our Llama Stack telemetry configuration. We are not hosting the model ourselves, so we will not visualize those metrics, however that could be a natural extension of our workshop if you run through these steps with your own model deployment.
-
-. Navigate to `Observe`-> `Traces` in the OpenShift web console navigation bar:
-+
-image::navigate-to-traces.png[]
-+
-. In the Tempo UI plugin, select the tempo instance from the drop-down:
-
-image::tempo-instance-select.png[]
+* **Traces**: Distributed traces showing the request flow with timing data
+* **Metrics**: Token counters (`llama_stack_prompt_tokens_total`, `llama_stack_completion_tokens_total`) labeled by model_id and provider_id
 
 == Understanding Distributed Tracing
 
-How do you know where time is spent? Which service is the bottleneck? Where errors actually originate? Distributed tracing answers these questions by connecting the dots across your entire system, showing you the complete journey of each request.
+Imagine following a request through your entire system—from user prompt to tool selection to tool execution to final response. Distributed tracing does exactly this by connecting spans (records of work) into a complete trace.
 
-Imagine following a student through their day on campus - from the library to the lab to office hours. You’d see where they spend the most time, where they get stuck, and what path they take. Distributed tracing does this for requests traveling across our Llama Stack framework between the different endpoints.
+Each span includes:
 
-Each service instruments its code to emit spans - records of work done. These spans include:
+* **Operation name**: What work was performed (e.g., "LLM inference", "tool_execution")
+* **Duration**: How long it took
+* **Parent span**: What triggered this operation (builds the request tree)
+* **Attributes**: Metadata like query text, documents retrieved, tokens generated
 
-* Operation name: What work was performed (e.g., “RAG query”, “LLM inference”)
-* Duration: How long it took (critical for finding bottlenecks)
-* Parent span: What triggered this operation (builds the request tree)
-* Attributes: Metadata like user ID, query text, documents retrieved, tokens generated
-
-When spans are connected by parent-child relationships, they form a trace - the complete story of our agent's actions, or simply our engagement with the Llama Stack playground.
+When spans connect via parent-child relationships, they form a trace—the complete story of your agent's actions.
 
 image::tracing-spans.png[]
 
-In this trace visualization, you can see the waterfall view showing:
+The waterfall view shows total request time, each service's contribution, sequential vs. parallel operations, and where the most time is spent.
 
-* Total request time and each service’s contribution
-* Which operations run sequentially vs. in parallel
-* Where the most time is spent (the longest bars)
-* Parent-child relationships (the tree structure)
+== Generate Trace Data
 
-== Generate new trace data
-
-. Refresh the playground in the browser. Select Agent-based, and one or multiple available tools. 
-
-. Complete a couple of agentic chat interactions of your choice, something that triggers tool calls.
-
-. You may complete a few regular direct chat interactions as well.
+. Navigate to `Observe` > `Traces` in the OpenShift web console:
 +
-NOTE: You may also choose to rerun the demo pipeline that triggers your agent. Since we had not yet enabled telemetry, the trace from our previous pipelinerun won't be available. 
+image::navigate-to-traces.png[]
+
+. Select the Tempo instance from the drop-down:
 +
-. It takes a few minutes for the traces to populate the Tempo UI plugin, so take your time in the playground or take a quick break.
+image::tempo-instance-select.png[]
 
-== Filter and view trace data
+. Go back to the Llama Stack Playground. Select **Agent-based** and one or more tools, then complete a few agentic chat interactions that trigger tool calls.
++
+NOTE: You may also re-run the demo pipeline that triggers your agent to generate traces from a real pipeline failure scenario.
 
-. Navigate back to the traces dashboard.
+. It takes a few minutes for traces to populate Tempo, so take your time in the playground.
 
-. We have constant traces generated from Llama Stack that are very basic health / readiness probes. You will see these span names as `/v1/providers` and `/v1/version`. This is fine to keep our app consistently up and running properly, but during debugging it can be considered a wee bit of "trace spam".
+== Filter and View Traces
+
+. Navigate back to the traces dashboard. You'll see constant health-check traces (`/v1/providers`, `/v1/version`) — these are readiness probes.
 +
 image::trace-spam.png[]
-+
-. Let's filter these out with a TraceQL query. Click on `Show Query`:
+
+. Filter these out with a TraceQL query. Click `Show Query`:
 +
 image::show-query.png[]
-+
-. Paste the following query into the `Query` text box:
+
+. Paste this query:
 +
 [source,sh,options="wrap",role="execute"]
 ----
 { span.raw_path!="/v1/providers" && span.raw_path!="/v1/version"}
 ----
-+
+
 . Click `Run Query`:
 +
 image::run-query.png[]
-+
-. You'll see a shorter list now, and more related to the tasks you've actively done in the above steps. You'll want to click on one of the following trace names to see the bulk of the action (you can tell also by the number of spans involved):
 
-* **create_agent_turn**
-* **/v1/inference/chat-completions**
+. You'll see a shorter list focused on your actual interactions. Look for these trace names:
+* **create_agent_turn** — the full agent reasoning and tool-calling flow
+* **/v1/inference/chat-completions** — direct inference calls
 
-. Look through as many as you'd like. Then, click on one of the **create_agent_turn** traces to dig in a little deeper.
+. Click on a **create_agent_turn** trace to dig in:
 +
 image::click-trace.png[]
-+
-. View the complete trace
+
+. View the complete trace:
 +
 image::full-trace.png[]
-+
-. View the span metadata by clicking on any span:
+
+. Click on any span to view its metadata:
 +
 image::span-metadata.png[]
-+
-. Review the primary data within this trace details page:
 
-* The individual spans and their names
-* Individual span time
+. Review the key data:
+* Individual spans and their names
+* Individual span duration
 * Overall trace time
 * Metadata for each span
-* Relationships between spans (what is triggered by something, what ran concurrently)
+* Parent-child relationships (what triggered what, what ran concurrently)
 
-NOTE: Download the trace details in a `.json` file to more easily search through the data.
+NOTE: Download the trace details as a `.json` file to more easily search through the data.
 
 image::download-trace.png[]
 
-== Investigate trace
+== Investigate Traces
 
-Armed with trace data, ask the following questions:
+Armed with trace data, work through these questions:
 
-. **What was your intent in this agent turn, and did the agent interpret it correctly?**
-.. Look at your user message in the agent turn request. Did the agent choose the correct toolgroup and tool for your intent?
+. **Did the agent interpret your intent correctly?**
+.. Look at your user message in the agent turn. Did the agent choose the correct toolgroup and tool?
 
 . **Which step took the longest: tool selection inference, tool execution, or final response inference?**
-.. Compare the durations of the inference spans vs the tool_execution span.
+.. Compare the durations of inference spans vs. tool_execution spans.
 
 . **What dominates overall time: tools, inference, or overhead?**
 .. Can anything be streamlined?
 
-. **Is the slowest step variable across traces or consistently the same component?**
+. **Is the slowest step consistent across traces or variable?**
 
-. **Is latency primarily due to remote inference over network, or due to the model itself?**
-.. Look for any evidence: short tool execution but long inference; any signs of retries/timeouts.
+. **Is latency due to remote inference over network, or the model itself?**
+.. Look for evidence: short tool execution but long inference, signs of retries/timeouts.
 
-. **Are we exporting sensitive/high-volume payloads into traces?**
-.. In our example, you can see pretty extensive pod and networking data dumped into the trace:
+. **Are we exporting sensitive data into traces?**
+.. In our example, extensive pod and networking data gets dumped into the trace:
 +
 image::too-much-pod-data.png[]
 +
-.. Think of some ways this potential security risk could be mitigated in future implementations.
+.. Think about how this security risk could be mitigated.
 
 . **Is tool output being reinjected verbatim?**
-.. Clue: In inference.input, in our example from above, the pod data was injected in its entirety. This is a classic driver of prompt token inflation. See where this might be happening in your example.
+.. In `inference.input`, pod data may have been injected in its entirety. This is a classic driver of prompt token inflation.
 
-. **Are tools being invoked in the optimal order, or is the agent serializing work that could be parallelized to reduce end-to-end latency?**
-.. Which tool calls are independent vs dependent?
+. **Are tools being invoked in the optimal order?**
+.. Could independent tool calls be parallelized to reduce end-to-end latency?
 
-. **Is this trace safe to store?**
-
-. **Across the agent turn, how many tokens were consumed in each inference step (tool-selection vs final response), and what changes would you make (if any) to reduce the count?**
-.. sum the total_tokens per inference span and compare prompt vs completion tokens.
-.. **What this is NOT including**: These trace token metrics reflect what Llama Stack observed for its own inference calls, but may exclude provider-side additions (proxy/gateway prompt rewriting, hidden system/safety wrappers), any unreported usage fields, and all non-LLM costs (tool payload size, network, retries).
-.. For the full picture, you also need to track **model metrics**. Provider/model usage is the closest thing to billing truth. Trace tokens give step-by-step attribution (which part of the agent turn caused the spend, and therefore what can I optimize). In production, use provider metrics for cost + traces for diagnosis/optimization.
+. **Across the agent turn, how many tokens were consumed?**
+.. Sum the `total_tokens` per inference span and compare prompt vs. completion tokens.
+.. These trace token metrics reflect Llama Stack's own inference calls but may exclude provider-side additions (proxy/gateway prompt rewriting, hidden system wrappers).
+.. For full cost attribution, combine provider metrics (billing truth) with traces (step-by-step optimization diagnosis).
 
 == Summary
 
-You now have the tools to observe, measure, and optimize your Llama Stack agent in production. Use distributed tracing to identify bottlenecks, reduce token costs, and ensure your agentic system runs reliably at scale.
-
-
-
-
-
-
-
-
-
-
+You now have the tools to observe, measure, and optimize your Llama Stack agent. Use distributed tracing to identify bottlenecks, reduce token costs, and ensure your agentic system runs reliably at scale.

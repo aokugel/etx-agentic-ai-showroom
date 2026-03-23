@@ -5,30 +5,29 @@ include::vars.adoc[]
 
 == What You've Accomplished
 
-You've deployed and operated a production-ready AI agent system on Red Hat AI. Through this hands-on workshop, you:
+Through this hands-on workshop, you:
 
-* **Became an expert at Llama Stack** and how to add new providers and extend and enhance your agent's functionality through the Llama Stack framework.
-* **Deployed an agentic application** using Llama Stack with multi-tool capabilities
-* **Configured observability** with OpenTelemetry distributed tracing
-* **Analyzed performance** using trace data to identify bottlenecks and optimize costs
+* **Explored Llama Stack** — the API layer for building generative AI applications on Red Hat AI — and used the Playground to interact with a model
+* **Configured tools and MCP integrations** — added websearch, OpenShift, and GitHub tool providers to Llama Stack in a single ConfigMap update
+* **Deployed an agentic application** that autonomously analyzes CI/CD failures and creates GitHub issues
+* **Ran a real pipeline**, watched it fail, and saw the agent automatically triage the failure
+* **Used distributed tracing** with OpenTelemetry and Tempo to understand agent behavior, identify bottlenecks, and analyze token costs
 
 == Key Technical Takeaways
 
-=== Production AI Requires Much More Than Models and Agent Apps
-The agent itself was pre-built, but making it production-ready required:
+=== Add Tools, Run the Pipeline, See It Work
+The core workflow is straightforward: configure tool integrations in Llama Stack, deploy the agent, trigger a pipeline, and observe the results. The power comes from how quickly you can extend an agent's capabilities by plugging in new MCP servers.
 
-* **Tool integration** for real-world capabilities (OpenShift API, web search, GitHub)
-* **Safety controls** to prevent unintended actions
-* **Observability infrastructure** to understand what's happening in production
-* **GitOps workflows** for repeatable, version-controlled deployments
-
-=== Observability is Critical
-Without proper observability and tracing, you're flying blind. The traces revealed:
+=== Observability Is Not Optional
+Without tracing, you're flying blind. Traces reveal:
 
 * Where time is actually spent (tool execution vs. inference vs. overhead)
 * Token consumption patterns that drive costs
-* Potential security issues (sensitive data in traces)
-* Opportunities for optimization
+* Potential security issues (sensitive data leaking into traces)
+* Optimization opportunities (parallelizing tool calls, reducing prompt inflation)
+
+=== Production AI Requires More Than Models
+Making an agent production-ready requires tool integration, observability infrastructure, and repeatable deployment workflows — not just a good model.
 
 == Resources
 
@@ -37,6 +36,6 @@ Without proper observability and tracing, you're flying blind. The traces reveal
 * **Model Context Protocol**: https://modelcontextprotocol.io
 * **OpenTelemetry**: https://opentelemetry.io
 
-## Closing Thought
+== Closing Thought
 
-Agentic AI systems solve real problems when properly instrumented, secured, and integrated into existing workflows on the right AI platform. The techniques you've practiced here are the foundation for delivering reliable AI solutions to clients.
+Agentic AI systems solve real problems when properly instrumented and integrated into existing workflows on the right AI platform. The techniques you've practiced here are the foundation for delivering reliable AI solutions to your clients and their customers.

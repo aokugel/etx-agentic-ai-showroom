@@ -210,12 +210,6 @@ Now that you understand the pattern, consider these potential extensions:
 * Integrate additional tools via MCP (monitoring systems, ticketing platforms, etc.)
 * Enhance the agent prompt to suggest automated fixes, not just documentation
 
-=== Coming up in Module 4
+=== Coming up next
 
-In the next module, you will learn how to prepare your agent for production by implementing:
-
-* *Guardrails*: Add safety mechanisms using Llama Guard to prevent harmful content in both inputs and outputs
-* *Observability*: Enable distributed tracing with OpenTelemetry and Tempo to understand agent behavior, identify bottlenecks, and optimize token usage
-* *Performance analysis*: Use trace data to investigate latency, tool execution patterns, and cost optimization opportunities
-
-These capabilities ensure your agent operates safely, efficiently, and reliably in production environments.
+Now that the agent is running and producing real interactions, we'll use the distributed tracing we configured earlier to observe agent behavior, understand where time is spent, and identify optimization opportunities.
