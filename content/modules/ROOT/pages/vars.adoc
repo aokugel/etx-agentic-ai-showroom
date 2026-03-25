@@ -1,8 +1,0 @@
-// Here are the variables used in the asciidoc / antora content.
-// They are defined here to decouple the vars injected in antora.yaml.
-:etx_agentic_ai_console_url: {openshift_console_url}
-:etx_agentic_ai_apps_domain: {openshift_cluster_ingress_domain}
-:etx_agentic_ai_username: {user}
-:etx_agentic_ai_password: {password}
-:etx_agentic_ai_login: {login_command}
-:etx_agentic_ai_project: wksp-{user}

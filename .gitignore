@@ -4,10 +4,6 @@
 # Ignore node_modules directory
 node_modules/
 
-# Ignore build output
-www/
-.cache/
-
 # Ignore IDE and editor files
 .vscode/
 .idea/
