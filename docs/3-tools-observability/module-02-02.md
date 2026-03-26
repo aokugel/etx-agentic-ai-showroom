@@ -139,6 +139,7 @@ data:
     - inference
     - tool_runtime
     - agents
+    - safety
     - telemetry
     - vector_io
     models:
