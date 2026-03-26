@@ -65,7 +65,7 @@ The model is already set up within the deployment, we just need to add in the sa
 
    The section you've just added should match the following:
 
-   ![Safety Shields Config](images/safety-sheilds-config.png)
+   ![Safety Shields Config](../images/safety-sheilds-config.png)
 
    3. As the last step, we need to register the shields in our showroom terminal (you may also use your own local terminal if you've installed the llama-stack-client there and are authenticated appropriately):
 
@@ -79,7 +79,7 @@ The model is already set up within the deployment, we just need to add in the sa
    llama-stack-client shields list
    ```
 
-   ![Register Shields](images/lsc-register-shields.png)
+   ![Register Shields](../images/lsc-register-shields.png)
 
 ## Test Guardrail functionality in the Llama Stack playground
 
@@ -91,9 +91,9 @@ The model is already set up within the deployment, we just need to add in the sa
 
 4. Add the Llama Guard model to the Input and Output shield form sections:
 
-![Input Shield](images/input-shield.png)
+![Input Shield](../images/input-shield.png)
 
-![Input Output Shields](images/input-output-sheilds.png)
+![Input Output Shields](../images/input-output-sheilds.png)
 
 ### Input Shields
 

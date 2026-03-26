@@ -8,7 +8,7 @@ In production Generative AI systems, observability is your ability to understand
 
 Red Hat AI provides [centralized platform observability](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/managing_openshift_ai/managing-observability_managing-rhoai): an integrated solution featuring the **OpenTelemetry Collector (OTC)** for data ingestion, **Prometheus** for metrics, and the **Red Hat build of Tempo** for distributed tracing.
 
-![Observability Stack](images/observability-stack.png)
+![Observability Stack](../images/observability-stack.png)
 
 We already enabled OpenTelemetry in our Llama Stack ConfigMap (the `telemetry` provider configured in the previous module). Llama Stack automatically creates spans for each inference request and emits token usage metrics. Each request generates:
 
@@ -28,7 +28,7 @@ Each span includes:
 
 When spans connect via parent-child relationships, they form a trace—the complete story of your agent's actions.
 
-![Tracing Spans](images/tracing-spans.png)
+![Tracing Spans](../images/tracing-spans.png)
 
 The waterfall view shows total request time, each service's contribution, sequential vs. parallel operations, and where the most time is spent.
 
@@ -36,11 +36,11 @@ The waterfall view shows total request time, each service's contribution, sequen
 
 1. Navigate to `Observe` > `Traces` in the OpenShift web console:
 
-![Navigate to Traces](images/navigate-to-traces.png)
+![Navigate to Traces](../images/navigate-to-traces.png)
 
 2. Select the Tempo instance from the drop-down:
 
-![Tempo Instance Select](images/tempo-instance-select.png)
+![Tempo Instance Select](../images/tempo-instance-select.png)
 
 3. Go back to the Llama Stack Playground. Select **Agent-based** and one or more tools, then complete a few agentic chat interactions that trigger tool calls.
 
@@ -52,11 +52,11 @@ The waterfall view shows total request time, each service's contribution, sequen
 
 1. Navigate back to the traces dashboard. You'll see constant health-check traces (`/v1/providers`, `/v1/version`) — these are readiness probes.
 
-![Trace Spam](images/trace-spam.png)
+![Trace Spam](../images/trace-spam.png)
 
 2. Filter these out with a TraceQL query. Click `Show Query`:
 
-![Show Query](images/show-query.png)
+![Show Query](../images/show-query.png)
 
 3. Paste this query:
 
@@ -66,7 +66,7 @@ The waterfall view shows total request time, each service's contribution, sequen
 
 4. Click `Run Query`:
 
-![Run Query](images/run-query.png)
+![Run Query](../images/run-query.png)
 
 5. You'll see a shorter list focused on your actual interactions. Look for these trace names:
    - **create_agent_turn** — the full agent reasoning and tool-calling flow
@@ -74,15 +74,15 @@ The waterfall view shows total request time, each service's contribution, sequen
 
 6. Click on a **create_agent_turn** trace to dig in:
 
-![Click Trace](images/click-trace.png)
+![Click Trace](../images/click-trace.png)
 
 7. View the complete trace:
 
-![Full Trace](images/full-trace.png)
+![Full Trace](../images/full-trace.png)
 
 8. Click on any span to view its metadata:
 
-![Span Metadata](images/span-metadata.png)
+![Span Metadata](../images/span-metadata.png)
 
 9. Review the key data:
    - Individual spans and their names
@@ -93,7 +93,7 @@ The waterfall view shows total request time, each service's contribution, sequen
 
 > **Note:** Download the trace details as a `.json` file to more easily search through the data.
 
-![Download Trace](images/download-trace.png)
+![Download Trace](../images/download-trace.png)
 
 ## Investigate Traces
 
@@ -116,7 +116,7 @@ Armed with trace data, work through these questions:
 6. **Are we exporting sensitive data into traces?**
    - In our example, extensive pod and networking data gets dumped into the trace:
 
-   ![Too Much Pod Data](images/too-much-pod-data.png)
+   ![Too Much Pod Data](../images/too-much-pod-data.png)
 
    - Think about how this security risk could be mitigated.
 

@@ -52,15 +52,15 @@ Select the *<USER_NAME>-llama-stack* namespace.
 
 1. Checkout the Playground pod.
 
-![Llama Stack Playground Pod](images/llamastack-playground-pod.png)
+![Llama Stack Playground Pod](../images/llamastack-playground-pod.png)
 
 2. Click on the route for this pod to access the Playground.
 
-![Llama Stack Playground Route](images/llamastack-playground-route.png)
+![Llama Stack Playground Route](../images/llamastack-playground-route.png)
 
 3. Here is the Playground GUI for interacting with Llama Stack services.
 
-![Llama Stack Playground UI](images/llama-stack-playground2.png)
+![Llama Stack Playground UI](../images/llama-stack-playground2.png)
 
 4. Let's first chat with the LLM by asking a question such as:
 
@@ -68,7 +68,7 @@ Select the *<USER_NAME>-llama-stack* namespace.
 What is AI?
 ```
 
-![Llama Stack Playground Hello](images/llama-stack-playground-hello.png)
+![Llama Stack Playground Hello](../images/llama-stack-playground-hello.png)
 
 5. Now let's ask the LLM a question for which it lacks information (e.g. real-time data):
 
@@ -76,6 +76,6 @@ What is AI?
 What is the weather today in Brisbane?
 ```
 
-![LlamaStack Playground without websearch](images/llamastack-playground-no-websearch.png)
+![LlamaStack Playground without websearch](../images/llamastack-playground-no-websearch.png)
 
 6. In order to find this type of real-time information, the LLM needs to call a tool like *websearch*. In the next module, we'll configure all the tools our agent needs — websearch, OpenShift, and GitHub — along with observability telemetry, in a single configuration update.

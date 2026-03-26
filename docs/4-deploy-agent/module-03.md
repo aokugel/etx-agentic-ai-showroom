@@ -33,7 +33,7 @@
 
 2. Once you understand how the agent works, edit the `agents.py` file with your correct username.
 
-![LLS URL Agent](images/lls-url-agent.png)
+![LLS URL Agent](../images/lls-url-agent.png)
 
 3. Save the file. Then, view the `agent/code/main.py` file to understand how the agent is triggered.
 
@@ -115,7 +115,7 @@ oc -n user${YOUR_USER_NUMBER}-ai-agent get routes
 
 or in the UI:
 
-![Argo Route](images/argo-route.png)
+![Argo Route](../images/argo-route.png)
 
 2. Verify health of app and associated agent pod running
 

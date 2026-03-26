@@ -34,7 +34,7 @@ Rather than editing this ConfigMap multiple times across several modules, we'll 
 
 1. Set up a [Tavily](https://app.tavily.com) API key for web search. Log in using a GitHub account of one of your team members.
 
-![Create Tavily API Key](images/tavily-apikey.png)
+![Create Tavily API Key](../images/tavily-apikey.png)
 
 2. Create a new secret object using this specification while replacing the PLACEHOLDER with your Tavily key. Use the `+` icon in the UI or your terminal:
 
@@ -57,7 +57,7 @@ oc edit llamastackdistribution/<USER_NAME>-llama-stack -n <USER_NAME>-llama-stac
 
 Replace `tavily-search-key` with `new-tavily-search-key` in the TAVILY_API_KEY secret reference.
 
-![Updated Llama Stack config](images/llamastackdistribution-updated-key.png)
+![Updated Llama Stack config](../images/llamastackdistribution-updated-key.png)
 
 ## Step 2: Set Up GitHub Access and MCP Server
 
@@ -67,11 +67,11 @@ We need GitHub integration for two purposes: the agent will create issues in you
 
 1. **Fork the repository**: Fork the [lab repository](https://github.com/rhpds/etx-agentic-ai-gitops) to your personal GitHub account.
 
-![GitHub Repo Fork](images/github-fork.png)
+![GitHub Repo Fork](../images/github-fork.png)
 
 2. **Enable Issues** for your fork: **Settings** > **General** > **Features** > **Issues** (disabled by default for forks).
 
-![GitHub Repo Enable Issues](images/github-repo-enable-issues.png)
+![GitHub Repo Enable Issues](../images/github-repo-enable-issues.png)
 
 3. **Create a GitHub personal access token**:
    1. Click your user icon > **Settings** > **Developer Settings** > **Personal Access Tokens** > **Fine-grained personal access tokens**
@@ -85,7 +85,7 @@ We need GitHub integration for two purposes: the agent will create issues in you
       **Metadata**: Read-Only (auto-added)<br>
       **Pull requests**: Read-Only
 
-![GitHub Repo Perms](images/github-repo-perms.png)
+![GitHub Repo Perms](../images/github-repo-perms.png)
 
    5. Generate the token and save it — you'll need it in a moment.
 
@@ -117,11 +117,11 @@ Now we'll update the `llama-stack-config` ConfigMap once with everything: the MC
 
 1. Within the `<USER_NAME>-llama-stack` project, navigate to ConfigMaps and select `llama-stack-config`.
 
-![LlamaStack ConfigMap location](images/llamastack-configmap-location.png)
+![LlamaStack ConfigMap location](../images/llamastack-configmap-location.png)
 
 2. Click on the YAML tab.
 
-![LlamaStack ConfigMap](images/llamastack-configmap.png)
+![LlamaStack ConfigMap](../images/llamastack-configmap.png)
 
 3. Replace the entire `run.yaml` content with the following. This is the complete final configuration including all tool providers and telemetry:
 
@@ -215,7 +215,7 @@ Here's what we added compared to the default configuration:
 
 5. Restart the playground by deleting its pod (starting with `llama-stack-playground`). Wait until it's Ready and Running.
 
-![Llama Stack Playground restart](images/llamastack-playground-restart.png)
+![Llama Stack Playground restart](../images/llamastack-playground-restart.png)
 
 ## Step 4: Test the Tools in the Playground
 
@@ -223,7 +223,7 @@ Here's what we added compared to the default configuration:
 
 1. Refresh the Playground in the browser. Select **Agent-based**, then select the built-in **websearch** tool.
 
-![LlamaStack Playground with websearch](images/llamastack-playground-websearch.png)
+![LlamaStack Playground with websearch](../images/llamastack-playground-websearch.png)
 
 2. Ask:
 
@@ -233,17 +233,17 @@ What is the weather today in Brisbane?
 
 The LLM now answers with real-time data provided by the websearch tool.
 
-![LlamaStack Playground regular websearch](images/llamastack-playground-websearch-regular.png)
+![LlamaStack Playground regular websearch](../images/llamastack-playground-websearch-regular.png)
 
 ### Test OpenShift MCP Tools
 
 1. Select the **openshift** MCP Server entry in the tool groups.
 
-![Llama Stack MCP OpenShift tool](images/llamastack-playground-mcp-openshift.png)
+![Llama Stack MCP OpenShift tool](../images/llamastack-playground-mcp-openshift.png)
 
 2. Expand `Tools from` to review the available tools.
 
-![Llama Stack MCP OpenShift tool list](images/llamastack-playground-mcp-openshift-tools.png)
+![Llama Stack MCP OpenShift tool list](../images/llamastack-playground-mcp-openshift-tools.png)
 
 3. Try:
 
@@ -263,11 +263,11 @@ List the pods in the mcp-openshift namespace.
 List the branches of the ${YOUR_GITHUB_USER}/etx-agentic-ai-gitops repository.
 ```
 
-![LlamaStack MCP GitHub](images/llama-playground-mcp-github-chat.png)
+![LlamaStack MCP GitHub](../images/llama-playground-mcp-github-chat.png)
 
 2. Review the list of GitHub tools available:
 
-![LlamaStack MCP OpenShift tool list](images/llamastack-playground-mcp-github-tools.png)
+![LlamaStack MCP OpenShift tool list](../images/llamastack-playground-mcp-github-tools.png)
 
 3. **Create a GitHub issue** — try this prompt (replace `${YOUR_GITHUB_USER}`):
 
@@ -279,13 +279,13 @@ Use the "create_issue" tool with these tool parameters:
 Do not add any optional parameters.
 ```
 
-![LlamaStack Playground Github issue prompt](images/playground-github-issue.png)
+![LlamaStack Playground Github issue prompt](../images/playground-github-issue.png)
 
 > **Note:** If unsuccessful, try refreshing the playground.
 
 4. Confirm that the issue was created in your repo.
 
-![Github issue](images/github-issue.png)
+![Github issue](../images/github-issue.png)
 
 ## Agent Types: Regular vs. ReAct
 
@@ -293,11 +293,11 @@ As you experiment in the Playground, you'll notice the option to use **Regular**
 
 **Regular agents** follow a straightforward flow: receive input → decide if a tool is needed → call the tool → process the response → answer.
 
-![Regular agent workflow](images/agent.png)
+![Regular agent workflow](../images/agent.png)
 
 **ReAct agents** use a **Re**asoning + **Act**ing loop: Think about what tool to use → Act by calling it → Observe the result → decide if more steps are needed. This makes ReAct more flexible for complex, multi-step tasks.
 
-![ReAct Agent](images/react-agent.png)
+![ReAct Agent](../images/react-agent.png)
 
 ## Summary
 

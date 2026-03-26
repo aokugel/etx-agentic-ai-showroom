@@ -25,11 +25,11 @@ We need to edit the `run.yaml` in our `llama-stack-config` ConfigMap to add the 
 
 1. Within the `<USER_NAME>-llama-stack` project, click on ConfigMaps and select `llama-stack-config` file.
 
-![LlamaStack ConfigMap location](images/llamastack-configmap-location.png)
+![LlamaStack ConfigMap location](../images/llamastack-configmap-location.png)
 
 2. Click on the YAML tab.
 
-![LlamaStack ConfigMap](images/llamastack-configmap.png)
+![LlamaStack ConfigMap](../images/llamastack-configmap.png)
 
 3. Add the following entry under `providers.tool_runtime`:
 
@@ -115,15 +115,15 @@ tool_groups:
 
 6. Restart the playground by deleting its pod (starting with `llama-stack-playground`). Wait until it's Ready and Running.
 
-![Llama Stack Playground restart](images/llamastack-playground-restart.png)
+![Llama Stack Playground restart](../images/llamastack-playground-restart.png)
 
 7. Refresh the playground in the browser. Select **Agent-based**, and then select the **openshift** MCP Server entry underneath the available tool groups.
 
-![Llama Stack MCP OpenShift tool](images/llamastack-playground-mcp-openshift.png)
+![Llama Stack MCP OpenShift tool](../images/llamastack-playground-mcp-openshift.png)
 
 8. Expand `Tools from` to review the list of tools available from the MCP server.
 
-![Llama Stack MCP OpenShift tool list](images/llamastack-playground-mcp-openshift-tools.png)
+![Llama Stack MCP OpenShift tool list](../images/llamastack-playground-mcp-openshift-tools.png)
 
 9. Try the prompt:
 
@@ -150,11 +150,11 @@ First, we need to enable access to our GitHub repository so our GitHub tools can
 
    1. Fork the [lab repository](https://github.com/rhpds/etx-agentic-ai-gitops) to your personal GitHub account.
 
-   ![GitHub Repo Fork](images/github-fork.png)
+   ![GitHub Repo Fork](../images/github-fork.png)
 
    2. Ensure that you **Enable Issues** for your fork under **Settings** > **General** > **Features** > **Issues** as they are disabled for forked repositories by default.
 
-   ![GitHub Repo Enable Issues](images/github-repo-enable-issues.png)
+   ![GitHub Repo Enable Issues](../images/github-repo-enable-issues.png)
 
 2. **Setup GitHub Token**
 
@@ -170,7 +170,7 @@ First, we need to enable access to our GitHub repository so our GitHub tools can
       **Metadata**: Read-Only (this gets added automatically)<br>
       **Pull requests**: Read-Only
 
-   ![GitHub Repo Perms](images/github-repo-perms.png)
+   ![GitHub Repo Perms](../images/github-repo-perms.png)
 
    6. Generate the token.
 
@@ -290,13 +290,13 @@ tool_groups:
 List the branches of the ${YOUR_GITHUB_USER}/etx-agentic-ai-gitops repository.
 ```
 
-![LlamaStack MCP GitHub](images/llama-playground-mcp-github-chat.png)
+![LlamaStack MCP GitHub](../images/llama-playground-mcp-github-chat.png)
 
 5. Experiment with prompts and perhaps multiple tools at a time.
 
 6. Review the list of tools that can invoked via the github tool provider.
 
-![LlamaStack MCP OpenShift tool list](images/llamastack-playground-mcp-github-tools.png)
+![LlamaStack MCP OpenShift tool list](../images/llamastack-playground-mcp-github-tools.png)
 
 7. **Create a GitHub issue**
 
@@ -310,13 +310,13 @@ List the branches of the ${YOUR_GITHUB_USER}/etx-agentic-ai-gitops repository.
    Do not add any optional parameters.
    ```
 
-   ![LlamaStack Playground Github issue prompt](images/playground-github-issue.png)
+   ![LlamaStack Playground Github issue prompt](../images/playground-github-issue.png)
 
    > **Note:** If it is unsuccessful, try refreshing the playground.
 
    Confirm that the issue has been created in your repo.
 
-   ![Github issue](images/github-issue.png)
+   ![Github issue](../images/github-issue.png)
 
 Great, we were able to have the LLM create a GitHub issue for us through a simple chat interface! We're now ready to move on from interactive experimentation to agent development.
 
