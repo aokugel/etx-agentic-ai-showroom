@@ -110,7 +110,7 @@ oc get apps -o wide
 1. Get route for user-scoped argo instance:
 
 ```bash
-oc -n user${YOUR_USER_NUMBER}-ai-agent get routes
+oc -n <USER_NAME>-ai-agent get routes
 ```
 
 or in the UI:
@@ -156,7 +156,7 @@ oc -n <USER_NAME>-ai-agent create -f etx-agentic-ai-gitops/lab-resources/demo-pi
 3. Monitor the PipelineRun:
 
 ```bash
-oc -n user${YOUR_USER_NUMBER}-ai-agent get pipelineruns -w
+oc -n <USER_NAME>-ai-agent get pipelineruns -w
 ```
 
 The pipeline will fail on the build step, which will trigger the `finally` step which calls the agent service to analyze the failure and create a GitHub issue.
